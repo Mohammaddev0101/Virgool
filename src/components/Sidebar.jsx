@@ -23,18 +23,33 @@ const Sidebar = () => {
         {/* Featured Content */}
         <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl p-6 text-white">
           <div className="flex items-center justify-between mb-4">
-            className="flex items-center space-x-2 space-x-reverse w-full text-right px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             <Coffee className="w-6 h-6" />
             <Shield className="w-4 h-4" />
           </div>
           <p className="text-sm opacity-90 mb-4">
             آموزش جامع بی نظیری برای شما
-            className="flex items-center space-x-2 space-x-reverse w-full text-right px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-            className="flex items-center space-x-2 space-x-reverse w-full text-right px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          </p>
+          <button className="flex items-center space-x-2 space-x-reverse w-full text-right px-3 py-2 rounded-lg text-sm bg-white/20 hover:bg-white/30 transition-colors">
             <Info className="w-4 h-4" />
-            <Mail className="w-4 h-4" />
             مشاهده بیشتر
           </button>
+        </div>
+
+        {/* Navigation Menu */}
+        <div>
+          <div className="space-y-2">
+            <button 
+              onClick={() => navigate('/notifications')}
+              className="flex items-center space-x-2 space-x-reverse w-full text-right px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            >
+              <Mail className="w-4 h-4" />
+              اعلان‌ها
+            </button>
+          </div>
+        </div>
+
+        {/* Topics Navigation */}
+        <div>
           <button 
             onClick={() => navigate('/topics')}
             className="flex items-center space-x-2 space-x-reverse w-full text-right px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
