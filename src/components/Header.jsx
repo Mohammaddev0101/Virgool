@@ -47,6 +47,7 @@ const Header = () => {
               <button 
                 onClick={() => navigate('/')}
                 className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                title="صفحه اصلی"
               >
                 <Home className="w-5 h-5 text-gray-600 dark:text-gray-300" />
               </button>
@@ -54,14 +55,24 @@ const Header = () => {
               {isLogin ? (
                 <>
                   <button className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                    onClick={() => navigate('/create-post')}
+                    title="نوشتن پست جدید"
+                  >
                     <Edit className="w-5 h-5 text-gray-600 dark:text-gray-300" />
                   </button>
                   
-                  <button className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                  <button 
+                    className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                    title="نشان شده‌ها"
+                  >
                     <Bookmark className="w-5 h-5 text-gray-600 dark:text-gray-300" />
                   </button>
 
-                  <button className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                  <button 
+                    onClick={() => navigate('/notifications')}
+                    className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                    title="اعلان‌ها"
+                  >
                     <Bell className="w-5 h-5 text-gray-600 dark:text-gray-300" />
                     <span className="absolute top-1 right-1 w-2 h-2 bg-blue-500 rounded-full"></span>
                   </button>
