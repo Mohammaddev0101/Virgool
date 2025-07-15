@@ -184,7 +184,7 @@ const CreatePostPage = () => {
                 </label>
                 <FileUpload
                   fieldname="coverImage"
-                  postId={null}
+                  postId={formData.postId || null}
                   onUploadSuccess={(fileUrl) => {
                     setFormData(prev => ({ ...prev, coverImage: fileUrl }));
                   }}
@@ -222,7 +222,7 @@ const CreatePostPage = () => {
                 </label>
                 <FileUpload
                   fieldname="podcast"
-                  postId={null}
+                  postId={formData.postId || null}
                   onUploadSuccess={(fileUrl) => {
                     setFormData(prev => ({ ...prev, podcastUrl: fileUrl }));
                   }}

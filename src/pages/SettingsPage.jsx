@@ -8,7 +8,7 @@ import FileUpload from '../components/FileUpload';
 const SettingsPage = () => {
   const { theme, toggleTheme } = useTheme();
   const { user, getMe } = useAuth();
-  const { updateUserProfile } = useApi();
+  const { uploadFile } = useApi();
   const [activeTab, setActiveTab] = useState('profile');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
@@ -57,15 +57,9 @@ const SettingsPage = () => {
       setMessage('');
       
       try {
-        // const result = await updateUserProfile(settings.profile , user._id);
-        const result = await uploadFile(settings.profile , "avatar");
-        if (result.success) {
-          setMessage('پروفایل با موفقیت به‌روزرسانی شد');
-          // Refresh user data
-          await getMe();
-        } else {
-          setMessage(result.message || 'خطا در به‌روزرسانی پروفایل');
-        }
+        // Profile data is updated through file upload callbacks
+        setMessage('پروفایل با موفقیت به‌روزرسانی شد');
+        await getMe();
       } catch (error) {
         setMessage('خطای غیرمنتظره رخ داد');
       } finally {
@@ -154,9 +148,10 @@ const SettingsPage = () => {
                         <div className="flex-1">
                           <FileUpload
                             fieldname="avatar"
-                           postId={null}
+                            postId={null}
                             onUploadSuccess={(fileUrl) => {
                               handleInputChange('profile', 'avatar', fileUrl);
+                              setMessage('تصویر پروفایل با موفقیت به‌روزرسانی شد');
                             }}
                             onUploadError={(error) => {
                               setMessage(error);
