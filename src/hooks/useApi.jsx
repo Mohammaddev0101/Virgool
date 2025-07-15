@@ -125,9 +125,10 @@ export const useApi = () => {
   const fetchTopics = async () => {
     try {
       const response = await axiosInstance.get('/topics');
+      
       return {
         success: true,
-        data: response.data
+        data: response.data.topics
       };
     } catch (error) {
       return {
@@ -155,7 +156,7 @@ export const useApi = () => {
 
   const fetchUserProfile = async (userId) => {
     try {
-      const response = await axiosInstance.get(`/users/${userId}`);
+      const response = await axiosInstance.get(`/auth/${userId}`);
       return {
         success: true,
         data: response.data
@@ -168,9 +169,9 @@ export const useApi = () => {
     }
   };
 
-  const updateUserProfile = async (userData) => {
+  const updateUserProfile = async (userData , userId) => {
     try {
-      const response = await axiosInstance.put('/users/profile', userData);
+      const response = await axiosInstance.put(`/auth/${userId}`, userData);
       return {
         success: true,
         data: response.data

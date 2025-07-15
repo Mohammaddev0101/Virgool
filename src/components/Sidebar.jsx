@@ -23,14 +23,13 @@ const Sidebar = () => {
         {/* Featured Content */}
         <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl p-6 text-white">
           <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-bold">ویرگول برای کسب‌وکار</h3>
             <Coffee className="w-6 h-6" />
-            <Shield className="w-4 h-4" />
           </div>
           <p className="text-sm opacity-90 mb-4">
             آموزش جامع بی نظیری برای شما
           </p>
-          <button className="flex items-center space-x-2 space-x-reverse w-full text-right px-3 py-2 rounded-lg text-sm bg-white/20 hover:bg-white/30 transition-colors">
-            <Info className="w-4 h-4" />
+          <button className="bg-white/20 hover:bg-white/30 transition-colors px-4 py-2 rounded-lg text-sm">
             مشاهده بیشتر
           </button>
         </div>

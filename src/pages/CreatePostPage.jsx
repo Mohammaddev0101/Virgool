@@ -68,7 +68,7 @@ const CreatePostPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!formData.title.trim() || !formData.content.trim() || !formData.summary.trim()) {
       alert('لطفاً تمام فیلدهای الزامی را پر کنید');
       return;
@@ -81,7 +81,7 @@ const CreatePostPage = () => {
 
     setLoading(true);
     const result = await createPost(formData);
-    
+
     if (result.success) {
       alert('پست با موفقیت ایجاد شد');
       navigate(`/post/${result.data._id}`);
@@ -252,7 +252,7 @@ const CreatePostPage = () => {
               <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
                 {formData.title || 'عنوان پست'}
               </h1>
-              
+
               {formData.coverImage && (
                 <img
                   src={formData.coverImage}
@@ -260,11 +260,11 @@ const CreatePostPage = () => {
                   className="w-full h-64 object-cover rounded-lg mb-6"
                 />
               )}
-              
+
               <p className="text-gray-600 dark:text-gray-400 mb-6 text-lg">
                 {formData.summary || 'خلاصه پست'}
               </p>
-              
+
               <div className="prose prose-lg max-w-none dark:prose-invert">
                 <div className="whitespace-pre-line">
                   {formData.content || 'محتوای پست اینجا نمایش داده می‌شود...'}
@@ -283,20 +283,24 @@ const CreatePostPage = () => {
               موضوعات *
             </h3>
             <div className="space-y-2 max-h-60 overflow-y-auto">
-              {topics.map((topic) => (
-                <label
-                  key={topic._id}
-                  className="flex items-center space-x-3 space-x-reverse p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg cursor-pointer"
-                >
-                  <input
-                    type="checkbox"
-                    checked={formData.topics.includes(topic._id)}
-                    onChange={() => handleTopicToggle(topic._id)}
-                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                  />
-                  <span className="text-gray-900 dark:text-white">{topic.name}</span>
-                </label>
-              ))}
+              {
+                topics.length && (
+                  topics.map((topic) => (
+                    <label
+                      key={topic._id}
+                      className="flex items-center space-x-3 space-x-reverse p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={formData.topics.includes(topic._id)}
+                        onChange={() => handleTopicToggle(topic._id)}
+                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                      />
+                      <span className="text-gray-900 dark:text-white">{topic.name}</span>
+                    </label>
+                  ))
+                )
+              }
             </div>
             {formData.topics.length === 0 && (
               <p className="text-red-500 text-sm mt-2">حداقل یک موضوع انتخاب کنید</p>
@@ -309,7 +313,7 @@ const CreatePostPage = () => {
               <Tag className="w-5 h-5 ml-2" />
               برچسب‌ها
             </h3>
-            
+
             <div className="flex space-x-2 space-x-reverse mb-3">
               <input
                 type="text"

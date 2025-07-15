@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect } from 'react';
 import { MapPin, Calendar, Link as LinkIcon, Users, BookOpen, Heart, MessageCircle, Eye, Settings, UserPlus, UserCheck } from 'lucide-react';
 import { useRouter } from '../hooks/useRouter';
 import { mockUsers, mockArticles } from '../data/mockData';
 import ArticleCard from '../components/ArticleCard';
+import { useApi } from '../hooks/useApi';
+import Loader from '../components/Loader';
 
 const UserPage = () => {
   const { params, navigate } = useRouter();
@@ -14,6 +16,7 @@ const UserPage = () => {
   const [loading, setLoading] = useState(true);
   
   useEffect(() => {
+    
     if (params.userId) {
       loadUserProfile();
     }

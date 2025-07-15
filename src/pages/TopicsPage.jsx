@@ -46,7 +46,7 @@ const TopicsPage = () => {
       {/* Topics Grid */}
       <div className="bg-gray-50 dark:bg-gray-900 min-h-screen">
         <div className="p-6">
-          {topics.length === 0 ? (
+          {topics.length == 0 ? (
             <div className="text-center py-12">
               <Hash className="w-16 h-16 text-gray-400 mx-auto mb-4" />
               <h3 className="text-xl font-medium text-gray-900 dark:text-white mb-2">
@@ -58,7 +58,7 @@ const TopicsPage = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {topics.map((topic) => (
+              { topics.map((topic) => (
                 <button
                   key={topic._id}
                   onClick={() => navigate(`/topics/${topic._id}`)}
