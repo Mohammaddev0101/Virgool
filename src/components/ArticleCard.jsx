@@ -122,8 +122,6 @@ const ArticleCard = ({
         </div>
       </div>
       </article>
-  );
-};
 
       <SavePostModal
         isOpen={showSaveModal}
@@ -132,4 +130,7 @@ const ArticleCard = ({
         postTitle={title}
       />
     </>
+  );
+};
+
 export default ArticleCard;
