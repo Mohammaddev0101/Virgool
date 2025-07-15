@@ -171,7 +171,9 @@ export const useApi = () => {
 
   const updateUserProfile = async (userData , userId) => {
     try {
-      const response = await axiosInstance.put(`/auth/${userId}`, userData);
+      const response = await axiosInstance.put(`/coverImage
+avatar
+podcast/${userId}`, userData);
       return {
         success: true,
         data: response.data
