@@ -184,6 +184,118 @@ export const useApi = () => {
     }
   };
 
+  // Lists API
+  const fetchUserLists = async () => {
+    try {
+      const response = await axiosInstance.get('/lists');
+      return {
+        success: true,
+        data: response.data
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || 'خطا در دریافت لیست‌ها'
+      };
+    }
+  };
+
+  const createList = async (listData) => {
+    try {
+      const response = await axiosInstance.post('/lists', listData);
+      return {
+        success: true,
+        data: response.data
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || 'خطا در ایجاد لیست'
+      };
+    }
+  };
+
+  const updateList = async (listId, listData) => {
+    try {
+      const response = await axiosInstance.put(`/lists/${listId}`, listData);
+      return {
+        success: true,
+        data: response.data
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || 'خطا در به‌روزرسانی لیست'
+      };
+    }
+  };
+
+  const deleteList = async (listId) => {
+    try {
+      await axiosInstance.delete(`/lists/${listId}`);
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || 'خطا در حذف لیست'
+      };
+    }
+  };
+
+  const addPostToList = async (listId, postId) => {
+    try {
+      const response = await axiosInstance.post(`/lists/${listId}/posts`, { postId });
+      return {
+        success: true,
+        data: response.data
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || 'خطا در اضافه کردن پست به لیست'
+      };
+    }
+  };
+
+  const removePostFromList = async (listId, postId) => {
+    try {
+      await axiosInstance.delete(`/lists/${listId}/posts/${postId}`);
+      return { success: true };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || 'خطا در حذف پست از لیست'
+      };
+    }
+  };
+
+  // File Upload API
+  const uploadFile = async (file, fieldname, postId = null) => {
+    try {
+      const formData = new FormData();
+      formData.append(fieldname, file);
+      if (postId) {
+        formData.append('postId', postId);
+      }
+
+      const response = await axiosInstance.post('/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      return {
+        success: true,
+        data: response.data
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || 'خطا در آپلود فایل'
+      };
+    }
+  };
+
   return {
     fetchPosts,
     fetchPost,
@@ -196,7 +308,14 @@ export const useApi = () => {
     fetchTopics,
     fetchPostsByTopic,
     fetchUserProfile,
-    updateUserProfile
+    updateUserProfile,
+    fetchUserLists,
+    createList,
+    updateList,
+    deleteList,
+    addPostToList,
+    removePostFromList,
+    uploadFile
   };
 };
 
