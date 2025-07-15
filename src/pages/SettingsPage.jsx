@@ -57,7 +57,8 @@ const SettingsPage = () => {
       setMessage('');
       
       try {
-        const result = await updateUserProfile(settings.profile , user._id);
+        // const result = await updateUserProfile(settings.profile , user._id);
+        const result = await uploadFile(settings.profile , "avatar");
         if (result.success) {
           setMessage('پروفایل با موفقیت به‌روزرسانی شد');
           // Refresh user data
