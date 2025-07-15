@@ -169,23 +169,6 @@ export const useApi = () => {
     }
   };
 
-  const updateUserProfile = async (userData , userId) => {
-    try {
-      const response = await axiosInstance.put(`/coverImage
-avatar
-podcast/${userId}`, userData);
-      return {
-        success: true,
-        data: response.data
-      };
-    } catch (error) {
-      return {
-        success: false,
-        message: error.response?.data?.message || 'خطا در بروزرسانی پروفایل'
-      };
-    }
-  };
-
   // Lists API
   const fetchUserLists = async () => {
     try {
@@ -310,7 +293,6 @@ podcast/${userId}`, userData);
     fetchTopics,
     fetchPostsByTopic,
     fetchUserProfile,
-    updateUserProfile,
     fetchUserLists,
     createList,
     updateList,
