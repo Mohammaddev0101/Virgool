@@ -153,6 +153,7 @@ const SettingsPage = () => {
                         <div className="flex-1">
                           <FileUpload
                             fieldname="avatar"
+                           postId={null}
                             onUploadSuccess={(fileUrl) => {
                               handleInputChange('profile', 'avatar', fileUrl);
                             }}
