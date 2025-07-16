@@ -40,7 +40,7 @@ export const useApi = () => {
       const response = await axiosInstance.get('/notifications');
       return {
         success: true,
-        data: response.data.filter(notification => !notification.isRead)
+        data: response.data
       };
     } catch (error) {
       return {

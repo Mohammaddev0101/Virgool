@@ -2,27 +2,38 @@ import React, { useState } from 'react';
 import { useEffect } from 'react';
 import { Heart, MessageCircle, Bookmark, Share, Eye, MoreHorizontal, Edit, Flag } from 'lucide-react';
 import { useRouter } from '../hooks/useRouter';
+import { useAuth } from '../contexts/AuthContext';
 import { useApi } from '../hooks/useApi';
+import AuthModal from '../components/AuthModal';
 import Loader from '../components/Loader';
 
 const PostPage = () => {
   const { params, navigate } = useRouter();
-  const { fetchPost, fetchComments, createComment, toggleLike } = useApi();
+  const { fetchPost, fetchComments, createComment, toggleLike, fetchPosts } = useApi();
+  const { isLogin } = useAuth();
   const [article, setArticle] = useState(null);
   const [comments, setComments] = useState([]);
+  const [relatedPosts, setRelatedPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [liked, setLiked] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
   const [showCommentForm, setShowCommentForm] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [rating, setRating] = useState(5);
   
   useEffect(() => {
     if (params.postId) {
       loadPost();
+      loadRelatedPosts();
     }
   }, [params.postId]);
 
+  useEffect(() => {
+    // Check if user has liked this post from localStorage
+    const likedPosts = JSON.parse(localStorage.getItem('likedPosts') || '[]');
+    setLiked(likedPosts.includes(params.postId));
+  }, [params.postId]);
   const loadPost = async () => {
     const result = await fetchPost(params.postId);
     console.log(result.data);
@@ -34,6 +45,21 @@ const PostPage = () => {
     setLoading(false);
   };
 
+  const loadRelatedPosts = async () => {
+    const result = await fetchPosts(1, 10);
+    if (result.success) {
+      // Get 3 random posts
+      const shuffled = result.data.sort(() => 0.5 - Math.random());
+      setRelatedPosts(shuffled.slice(0, 3));
+    }
+  };
+
+  const getTotalViews = (views) => {
+    if (Array.isArray(views)) {
+      return views.reduce((sum, view) => sum + view, 0);
+    }
+    return views || 0;
+  };
   if (loading) {
     return (
       <div className="flex-1 max-w-4xl mx-auto p-6">
@@ -59,13 +85,30 @@ const PostPage = () => {
   }
 
   const handleLike = async () => {
+    if (!isLogin) {
+      setShowAuthModal(true);
+      return;
+    }
+
     const result = await toggleLike(params.postId);
     if (result.success) {
-      setLiked(!liked);
+      const newLikedState = !liked;
+      setLiked(newLikedState);
+      
+      // Update localStorage
+      const likedPosts = JSON.parse(localStorage.getItem('likedPosts') || '[]');
+      if (newLikedState) {
+        likedPosts.push(params.postId);
+      } else {
+        const index = likedPosts.indexOf(params.postId);
+        if (index > -1) likedPosts.splice(index, 1);
+      }
+      localStorage.setItem('likedPosts', JSON.stringify(likedPosts));
+      
       // Update article stats
       setArticle(prev => ({
         ...prev,
-        likesCount: liked ? prev.likesCount - 1 : prev.likesCount + 1
+        likesCount: newLikedState ? (prev.likesCount || 0) + 1 : Math.max(0, (prev.likesCount || 0) - 1)
       }));
     }
   };
@@ -76,6 +119,10 @@ const PostPage = () => {
 
   const handleCommentSubmit = (e) => {
     e.preventDefault();
+    if (!isLogin) {
+      setShowAuthModal(true);
+      return;
+    }
     if (newComment.trim()) {
       submitComment();
     }
@@ -118,6 +165,7 @@ const PostPage = () => {
   const defaultAvatar = "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop";
 
   return (
+    <>
     <div className="flex-1 max-w-4xl mx-auto">
       {/* Article Header */}
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
@@ -180,7 +228,7 @@ const PostPage = () => {
           <div className="flex items-center space-x-6 space-x-reverse text-gray-500 dark:text-gray-400">
             <div className="flex items-center space-x-1 space-x-reverse">
               <Eye className="w-4 h-4" />
-              <span className="text-sm">{article.views || 0} بازدید</span>
+              <span className="text-sm">{getTotalViews(article.views)} بازدید</span>
             </div>
             <div className="flex items-center space-x-1 space-x-reverse">
               <Heart className="w-4 h-4" />
@@ -229,7 +277,7 @@ const PostPage = () => {
                 }`}
               >
                 <Heart className={`w-5 h-5 ${liked ? 'fill-current' : ''}`} />
-                <span>{article.likeCount + (liked ? 1 : 0)}</span>
+                <span>{article.likeCount || 0}</span>
               </button>
               
               <button 
@@ -263,6 +311,45 @@ const PostPage = () => {
         </div>
       </div>
 
+      {/* Related Posts */}
+      {relatedPosts.length > 0 && (
+        <div className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+          <div className="p-6">
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
+              مقالات مرتبط
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {relatedPosts.map((post) => (
+                <button
+                  key={post._id}
+                  onClick={() => navigate(`/post/${post._id}`)}
+                  className="text-right hover:shadow-lg transition-shadow bg-gray-50 dark:bg-gray-700 rounded-xl overflow-hidden"
+                >
+                  {post.coverImage && (
+                    <img 
+                      src={post.coverImage} 
+                      alt={post.title}
+                      className="w-full h-32 object-cover"
+                    />
+                  )}
+                  <div className="p-4">
+                    <h4 className="font-medium text-gray-900 dark:text-white mb-2 line-clamp-2">
+                      {post.title}
+                    </h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                      {post.summary}
+                    </p>
+                    <div className="flex items-center justify-between mt-3 text-xs text-gray-500 dark:text-gray-400">
+                      <span>{post.author.name}</span>
+                      <span>{post.estimatedReadTime} دقیقه</span>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
       {/* Comment Form */}
       {showCommentForm && (
         <div className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-6">
@@ -372,6 +459,13 @@ const PostPage = () => {
         </div>
       </div>
     </div>
+
+    <AuthModal
+      isOpen={showAuthModal}
+      onClose={() => setShowAuthModal(false)}
+      initialMode="login"
+    />
+    </>
   );
 };
 
