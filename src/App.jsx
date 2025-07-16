@@ -18,6 +18,7 @@ import SettingsPage from './pages/SettingsPage';
 import NotFoundPage from './pages/NotFoundPage';
 import SavedPostsPage from './pages/SavedPostsPage';
 import SavedListPage from './pages/SavedListPage';
+import SearchPage from './pages/SearchPage';
 import DashboardOverview from './pages/dashboard/DashboardOverview';
 import UsersManagement from './pages/dashboard/UsersManagement';
 import PostsManagement from './pages/dashboard/PostsManagement';
@@ -41,6 +42,7 @@ const AppContent = () => {
     if (currentPath === '/settings') return <SettingsPage />;
     if (currentPath === '/saved-posts') return <SavedPostsPage />;
     if (currentPath.startsWith('/saved-lists/')) return <SavedListPage />;
+    if (currentPath === '/search') return <SearchPage />;
     if (currentPath === '/dashboard') return <DashboardOverview />;
     if (currentPath === '/dashboard/users') return <UsersManagement />;
     if (currentPath === '/dashboard/posts') return <PostsManagement />;

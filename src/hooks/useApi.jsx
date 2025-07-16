@@ -4,9 +4,13 @@ import { useAuth } from '../contexts/AuthContext';
 export const useApi = () => {
   const { axiosInstance } = useAuth();
 
-  const fetchPosts = async (page = 1, limit = 5) => {
+  const fetchPosts = async (page = 1, limit = 5, search = '') => {
     try {
-      const response = await axiosInstance.get(`/posts?page=${page}&limit=${limit}`);
+      let url = `/posts?page=${page}&limit=${limit}`;
+      if (search) {
+        url += `&search=${encodeURIComponent(search)}`;
+      }
+      const response = await axiosInstance.get(url);
       return {
         success: true,
         data: response.data.posts || response.data,

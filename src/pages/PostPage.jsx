@@ -60,6 +60,36 @@ const PostPage = () => {
     }
     return views || 0;
   };
+
+  const getTimeAgo = (dateString) => {
+    const now = new Date();
+    const date = new Date(dateString);
+    const diffInMs = now - date;
+    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+    
+    if (diffInDays === 0) {
+      const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
+      if (diffInHours === 0) {
+        const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+        return diffInMinutes <= 1 ? 'همین الان' : `${diffInMinutes} دقیقه پیش`;
+      }
+      return `${diffInHours} ساعت پیش`;
+    } else if (diffInDays === 1) {
+      return 'دیروز';
+    } else if (diffInDays < 7) {
+      return `${diffInDays} روز پیش`;
+    } else if (diffInDays < 30) {
+      const weeks = Math.floor(diffInDays / 7);
+      return `${weeks} هفته پیش`;
+    } else if (diffInDays < 365) {
+      const months = Math.floor(diffInDays / 30);
+      return `${months} ماه پیش`;
+    } else {
+      const years = Math.floor(diffInDays / 365);
+      return `${years} سال پیش`;
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex-1 max-w-4xl mx-auto p-6">
@@ -189,7 +219,7 @@ const PostPage = () => {
                   <p className="text-sm text-gray-500 dark:text-gray-400">@{article.author.username || article.author.email}</p>
                 </button>
                 <p className="text-sm text-gray-400 dark:text-gray-500">
-                  {new Date(article.createdAt).toLocaleDateString('fa-IR')} • {article.estimatedReadTime} دقیقه مطالعه
+                  {getTimeAgo(article.createdAt)} • {article.estimatedReadTime} دقیقه مطالعه
                 </p>
               </div>
             </div>
