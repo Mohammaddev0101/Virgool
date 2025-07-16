@@ -2,7 +2,7 @@ import React from 'react';
 import { Play, TrendingUp, Users, BookOpen, Hash, Star, Coffee, Info, Shield, Mail } from 'lucide-react';
 import { useRouter } from '../hooks/useRouter';
 
-const Sidebar = () => {
+const Sidebar = ({ className = "" }) => {
   const { navigate } = useRouter();
   
   const popularTags = [
@@ -18,7 +18,7 @@ const Sidebar = () => {
   ];
 
   return (
-    <aside className="w-80 bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-700 h-full overflow-y-auto">
+    <aside className={`w-96 bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-700 h-full overflow-y-auto ${className}`}>
       <div className="p-6 space-y-8">
         {/* Featured Content */}
         <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl p-6 text-white">
@@ -168,21 +168,21 @@ const Sidebar = () => {
               onClick={() => navigate('/about')}
               className="flex items-center space-x-2 space-x-reverse w-full text-right px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             >
-              <Info className="w-4 h-4" />
+              <Info className="w-4 h-4 ml-3" />
               درباره ما
             </button>
             <button 
               onClick={() => navigate('/rules')}
               className="flex items-center space-x-2 space-x-reverse w-full text-right px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             >
-              <Shield className="w-4 h-4" />
+              <Shield className="w-4 h-4 ml-3" />
               قوانین و مقررات
             </button>
             <button 
               onClick={() => navigate('/contact')}
               className="flex items-center space-x-2 space-x-reverse w-full text-right px-3 py-2 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             >
-              <Mail className="w-4 h-4" />
+              <Mail className="w-4 h-4 ml-3" />
               تماس با ما
             </button>
           </div>

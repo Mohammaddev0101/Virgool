@@ -8,7 +8,7 @@ import FileUpload from '../components/FileUpload';
 const SettingsPage = () => {
   const { theme, toggleTheme } = useTheme();
   const { user, getMe } = useAuth();
-  const { uploadFile } = useApi();
+  const { updateUserProfile } = useApi();
   const [activeTab, setActiveTab] = useState('profile');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
@@ -57,9 +57,14 @@ const SettingsPage = () => {
       setMessage('');
       
       try {
-        // Profile data is updated through file upload callbacks
-        setMessage('پروفایل با موفقیت به‌روزرسانی شد');
-        await getMe();
+        const result = await updateUserProfile(settings.profile , user._id);
+        if (result.success) {
+          setMessage('پروفایل با موفقیت به‌روزرسانی شد');
+          // Refresh user data
+          await getMe();
+        } else {
+          setMessage(result.message || 'خطا در به‌روزرسانی پروفایل');
+        }
       } catch (error) {
         setMessage('خطای غیرمنتظره رخ داد');
       } finally {
