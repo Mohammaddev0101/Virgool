@@ -8,7 +8,7 @@ export const useApi = () => {
     try {
       let url = `/posts?page=${page}&limit=${limit}`;
       if (search) {
-        url += `&search=${encodeURIComponent(search)}`;
+        url += `&title=${encodeURIComponent(search)}`;
       }
       const response = await axiosInstance.get(url);
       return {
@@ -56,7 +56,7 @@ export const useApi = () => {
 
   const markNotificationAsRead = async (id) => {
     try {
-      await axiosInstance.patch(`/notifications/${id}/read`);
+      await axiosInstance.put(`/notifications/${id}/read`);
       return { success: true };
     } catch (error) {
       return {
@@ -299,7 +299,8 @@ export const useApi = () => {
 
   const fetchAllUserProfile = async () => {
     try {
-      const response = await axiosInstance.get('/auth');
+      const response = await axiosInstance.get('/auth')
+      
       return {
         success: true,
         data: response.data

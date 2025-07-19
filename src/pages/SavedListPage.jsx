@@ -7,7 +7,7 @@ import Loader from '../components/Loader';
 
 const SavedListPage = () => {
   const { params, navigate } = useRouter();
-  const { fetchUserLists, removePostFromList } = useApi();
+  const { fetchUserLists, removePostFromList, fetchPosts } = useApi();
   const [list, setList] = useState(null);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,12 +22,18 @@ const SavedListPage = () => {
     setLoading(true);
     const result = await fetchUserLists();
     if (result.success) {
-      const foundList = result.data.find(l => l._id === params.listId);
+      const foundList = result.data.find(l => l._id == params.listId);
+
       if (foundList) {
         setList(foundList);
-        // In a real app, you'd fetch the actual post data
-        // For now, we'll simulate it
-        setPosts(foundList.posts || []);
+
+        // Search posts
+        const postsResult = await fetchPosts(1, 20);
+        const posts = postsResult.success ? postsResult.data : [];
+
+        const foundPosts = posts.filter(post => foundList.posts.includes(post._id));
+
+        setPosts(foundPosts || []);
       }
     }
     setLoading(false);
@@ -55,7 +61,7 @@ const SavedListPage = () => {
       <div className="flex-1 max-w-4xl mx-auto p-6">
         <div className="text-center py-12">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">لیست یافت نشد</h2>
-          <button 
+          <button
             onClick={() => navigate('/saved-posts')}
             className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg transition-colors"
           >
@@ -78,7 +84,7 @@ const SavedListPage = () => {
             <ArrowRight className="w-4 h-4" />
             <span>بازگشت به لیست‌ها</span>
           </button>
-          
+
           <div className="flex items-center space-x-4 space-x-reverse">
             <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
               <Bookmark className="w-8 h-8 text-white" />
@@ -134,7 +140,7 @@ const SavedListPage = () => {
                     tags={post.tags}
                     readTime={post.estimatedReadTime}
                   />
-                  
+
                   {/* Remove from list button */}
                   <button
                     onClick={() => handleRemovePost(post._id)}

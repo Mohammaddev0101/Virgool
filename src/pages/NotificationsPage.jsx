@@ -19,7 +19,7 @@ const NotificationsPage = () => {
     const result = await fetchNotifications();
     if (result.success) {
       // Show all notifications (both read and unread)
-      setNotifications(result.data);
+      setNotifications(result.data.notifications);
     }
     setLoading(false);
   };

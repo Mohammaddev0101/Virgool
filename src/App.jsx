@@ -36,13 +36,13 @@ const AppContent = () => {
     if (currentPath === '/topics') return <TopicsPage />;
     if (currentPath.startsWith('/topics/')) return <TopicPostsPage />;
     if (currentPath.startsWith('/user/')) return <UserPage />;
+    if (currentPath.startsWith('/search')) return <SearchPage />;
     if (currentPath === '/about') return <AboutPage />;
     if (currentPath === '/rules') return <RulesPage />;
     if (currentPath === '/contact') return <ContactPage />;
     if (currentPath === '/settings') return <SettingsPage />;
     if (currentPath === '/saved-posts') return <SavedPostsPage />;
     if (currentPath.startsWith('/saved-lists/')) return <SavedListPage />;
-    if (currentPath === '/search') return <SearchPage />;
     if (currentPath === '/dashboard') return <DashboardOverview />;
     if (currentPath === '/dashboard/users') return <UsersManagement />;
     if (currentPath === '/dashboard/posts') return <PostsManagement />;

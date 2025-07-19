@@ -22,6 +22,8 @@ const ArticleCard = ({
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
 
+  
+
   const getTotalViews = (views) => {
     if (Array.isArray(views)) {
       return views.reduce((sum, view) => sum + view, 0);
@@ -30,33 +32,42 @@ const ArticleCard = ({
   };
 
   const getTimeAgo = (dateString) => {
-    const now = new Date();
-    const date = new Date(dateString);
-    const diffInMs = now - date;
-    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
-    
-    if (diffInDays === 0) {
-      const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
-      if (diffInHours === 0) {
-        const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
-        return diffInMinutes <= 1 ? 'همین الان' : `${diffInMinutes} دقیقه پیش`;
-      }
-      return `${diffInHours} ساعت پیش`;
-    } else if (diffInDays === 1) {
-      return 'دیروز';
-    } else if (diffInDays < 7) {
-      return `${diffInDays} روز پیش`;
-    } else if (diffInDays < 30) {
-      const weeks = Math.floor(diffInDays / 7);
-      return `${weeks} هفته پیش`;
-    } else if (diffInDays < 365) {
-      const months = Math.floor(diffInDays / 30);
-      return `${months} ماه پیش`;
-    } else {
-      const years = Math.floor(diffInDays / 365);
-      return `${years} سال پیش`;
+  if (!dateString || isNaN(new Date(dateString))) {
+    return 'تاریخ نامعتبر';
+  }
+
+  const now = new Date();
+  const date = new Date(dateString);
+  const diffInMs = now - date;
+
+  if (diffInMs < 0) {
+    return 'زمان آینده';
+  }
+
+  const diffInMinutes = Math.round(diffInMs / (1000 * 60));
+  const diffInHours = Math.round(diffInMs / (1000 * 60 * 60));
+  const diffInDays = Math.round(diffInMs / (1000 * 60 * 60 * 24));
+
+  if (diffInDays === 0) {
+    if (diffInHours === 0) {
+      return diffInMinutes <= 1 ? 'همین الان' : `${diffInMinutes} دقیقه پیش`;
     }
-  };
+    return `${diffInHours} ساعت پیش`;
+  } else if (diffInDays === 1) {
+    return 'دیروز';
+  } else if (diffInDays < 7) {
+    return `${diffInDays} روز پیش`;
+  } else if (diffInDays < 30) {
+    const weeks = Math.round(diffInDays / 7);
+    return `${weeks} هفته پیش`;
+  } else if (diffInDays < 365) {
+    const months = Math.round(diffInDays / 30);
+    return `${months} ماه پیش`;
+  } else {
+    const years = Math.round(diffInDays / 365);
+    return `${years} سال پیش`;
+  }
+};
 
   const handleSaveClick = () => {
     if (!isLogin) {
@@ -103,7 +114,7 @@ const ArticleCard = ({
             </button>
           </div>
           <div className="text-xs text-gray-400 dark:text-gray-500">
-            <div>{getTimeAgo(publishedAt)}</div>
+            <div>{publishedAt}</div>
             <div>{readTime} دقیقه مطالعه</div>
           </div>
         </div>

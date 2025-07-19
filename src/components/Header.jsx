@@ -11,7 +11,7 @@ const Header = () => {
   const { theme, toggleTheme } = useTheme();
   const { navigate } = useRouter();
   const { isLogin, user, LogOutUser } = useAuth();
-  const { fetchNotifications, markNotificationAsRead } = useApi();
+  const { fetchNotifications, markNotificationAsRead , fetchPosts} = useApi();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState('login');
   const [searchTerm, setSearchTerm] = useState('');
@@ -30,7 +30,7 @@ const Header = () => {
     const result = await fetchNotifications();
     if (result.success) {
       // Only show unread notifications in dropdown
-      setNotifications(result.data.filter(n => !n.isRead));
+      setNotifications(result.data.notifications.filter(n => !n.isRead));
     }
   };
 
@@ -107,8 +107,9 @@ const Header = () => {
                   onChange={(e) => {
                     setSearchTerm(e.target.value);
                     handleSearch(e.target.value);
+                    searchTerm.length && setShowSearchDropdown(true)
                   }}
-                  onFocus={() => searchTerm && setShowSearchDropdown(true)}
+                  // onFocus={() => searchTerm.length && setShowSearchDropdown(true)}
                   onBlur={() => setTimeout(() => setShowSearchDropdown(false), 200)}
                   className="w-[300px] text-sm shadow pl-4 pr-10 py-2 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
@@ -135,6 +136,7 @@ const Header = () => {
                               onClick={() => {
                                 navigate(`/post/${post._id}`);
                                 setShowSearchDropdown(false);
+                                setSearchTerm('')
                               }}
                               className="w-full text-right p-2 hover:bg-gray-50 dark:hover:bg-gray-700 rounded"
                             >
@@ -251,7 +253,7 @@ const Header = () => {
                     <button
                     onClick={() => navigate('/notifications')}
                     onMouseEnter={handleNotificationHover}
-                    onMouseLeave={() => setShowNotifications(false)}
+                    // onMouseLeave={() => setShowNotifications(false)}
                     className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                     title="اعلان‌ها"
                   >

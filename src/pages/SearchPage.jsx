@@ -7,7 +7,7 @@ import Loader from '../components/Loader';
 
 const SearchPage = () => {
   const { navigate } = useRouter();
-  const { fetchPosts, fetchTopics } = useApi();
+  const { fetchPosts, fetchTopics ,fetchAllUserProfile } = useApi();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState('posts');
   const [loading, setLoading] = useState(false);
@@ -43,9 +43,14 @@ const SearchPage = () => {
         topic.description?.toLowerCase().includes(query.toLowerCase())
       );
 
-      // Mock users search (you can implement this API)
-      const users = [];
-
+      // Search Users
+      const usersResult = await fetchAllUserProfile();
+      const allUsers = usersResult.success ? usersResult.data.users : [];
+      
+      const users = allUsers.filter(user => 
+        user.name.toLowerCase().includes(query.toLowerCase())
+      );
+      
       setResults({ posts, users, topics });
     } catch (error) {
       console.error('Search error:', error);
