@@ -56,6 +56,7 @@ const HomePage = () => {
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
+      });
     }
     setLoading(false);
   };

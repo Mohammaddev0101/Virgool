@@ -277,11 +277,6 @@ const CreatePostPage = () => {
                       icon: 'error',
                       confirmButtonText: 'باشه'
                     });
-                      title: 'خطا!',
-                      text: error,
-                      icon: 'error',
-                      confirmButtonText: 'باشه'
-                    });
                   }}
                   accept="audio/*"
                   maxSize={50 * 1024 * 1024} // 50MB for audio
