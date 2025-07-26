@@ -1,0 +1,1194 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Paragraph API",
+    "description": "Persian blogging platform API documentation",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Paragraph Support",
+      "email": "support@paragraph.io"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://virgool.onrender.com/v1",
+      "description": "Production server"
+    },
+    {
+      "url": "http://localhost:3000/v1",
+      "description": "Development server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "username": { "type": "string" },
+          "email": { "type": "string" },
+          "name": { "type": "string" },
+          "bio": { "type": "string" },
+          "avatar": { "type": "string" },
+          "role": { "type": "string", "enum": ["user", "admin"] },
+          "isBanned": { "type": "boolean" },
+          "followers": { "type": "array", "items": { "type": "string" } },
+          "followingUsers": { "type": "array", "items": { "type": "string" } },
+          "followingTopics": { "type": "array", "items": { "type": "string" } },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Post": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "title": { "type": "string" },
+          "content": { "type": "string" },
+          "summary": { "type": "string" },
+          "author": { "$ref": "#/components/schemas/User" },
+          "topics": { "type": "array", "items": { "$ref": "#/components/schemas/Topic" } },
+          "tags": { "type": "array", "items": { "type": "string" } },
+          "coverImage": { "type": "string" },
+          "estimatedReadTime": { "type": "number" },
+          "isPublished": { "type": "boolean" },
+          "views": { "type": "array", "items": { "type": "number" } },
+          "rating": { "type": "number" },
+          "ratingCount": { "type": "number" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Comment": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "content": { "type": "string" },
+          "userId": { "$ref": "#/components/schemas/User" },
+          "postId": { "type": "string" },
+          "parentComment": { "type": "string" },
+          "status": { "type": "string", "enum": ["pending", "approved", "rejected"] },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Topic": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "parentTopic": { "type": "string" },
+          "isMainTopic": { "type": "boolean" },
+          "followers": { "type": "array", "items": { "type": "string" } },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "List": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "user": { "type": "string" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "posts": { "type": "array", "items": { "type": "string" } },
+          "isPrivate": { "type": "boolean" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Notification": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "user": { "type": "string" },
+          "type": { "type": "string", "enum": ["newFollower", "newComment", "newLike", "newPost"] },
+          "message": { "type": "string" },
+          "isRead": { "type": "boolean" },
+          "relatedPost": { "type": "string" },
+          "relatedUser": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Register new user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["username", "email", "password", "name", "phone"],
+                "properties": {
+                  "username": { "type": "string" },
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string", "minLength": 4 },
+                  "name": { "type": "string" },
+                  "phone": { "type": "string" },
+                  "bio": { "type": "string" },
+                  "avatar": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User registered successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "token": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Login user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string" },
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "token": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Get current user profile",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "User profile",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/User" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get all users (Admin only)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Filter by name"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "users": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/User" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/{id}": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get user by ID",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": { "$ref": "#/components/schemas/User" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Users"],
+        "summary": "Update user profile",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": { "type": "string" },
+                  "name": { "type": "string" },
+                  "bio": { "type": "string" },
+                  "avatar": { "type": "string" },
+                  "socialLinks": {
+                    "type": "object",
+                    "properties": {
+                      "linkedin": { "type": "string" },
+                      "twitter": { "type": "string" },
+                      "github": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User updated successfully"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Users"],
+        "summary": "Delete user (Admin only)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User deleted successfully"
+          }
+        }
+      }
+    },
+    "/auth/{userId}/follow": {
+      "post": {
+        "tags": ["Users"],
+        "summary": "Follow user",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User followed successfully"
+          }
+        }
+      }
+    },
+    "/auth/{userId}/unfollow": {
+      "post": {
+        "tags": ["Users"],
+        "summary": "Unfollow user",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User unfollowed successfully"
+          }
+        }
+      }
+    },
+    "/auth/{id}/ban": {
+      "put": {
+        "tags": ["Users"],
+        "summary": "Ban user (Admin only)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User banned successfully"
+          }
+        }
+      }
+    },
+    "/auth/{id}/unban": {
+      "put": {
+        "tags": ["Users"],
+        "summary": "Unban user (Admin only)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User unbanned successfully"
+          }
+        }
+      }
+    },
+    "/auth/{id}/change-role": {
+      "put": {
+        "tags": ["Users"],
+        "summary": "Change user role (Admin only)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User role changed successfully"
+          }
+        }
+      }
+    },
+    "/auth/{topicId}/follow-topic": {
+      "post": {
+        "tags": ["Users"],
+        "summary": "Follow topic",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "topicId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Topic followed successfully"
+          }
+        }
+      }
+    },
+    "/auth/{topicId}/unfollow-topic": {
+      "post": {
+        "tags": ["Users"],
+        "summary": "Unfollow topic",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "topicId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Topic unfollowed successfully"
+          }
+        }
+      }
+    },
+    "/posts": {
+      "get": {
+        "tags": ["Posts"],
+        "summary": "Get posts with pagination",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "default": 1 }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": { "type": "integer", "default": 5 }
+          },
+          {
+            "name": "title",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Search by title"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of posts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "posts": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Post" }
+                    },
+                    "currentPage": { "type": "integer" },
+                    "totalPages": { "type": "integer" },
+                    "totalPosts": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Posts"],
+        "summary": "Create new post",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["title", "content", "summary"],
+                "properties": {
+                  "title": { "type": "string" },
+                  "content": { "type": "string" },
+                  "summary": { "type": "string" },
+                  "topics": { "type": "array", "items": { "type": "string" } },
+                  "tags": { "type": "array", "items": { "type": "string" } },
+                  "coverImage": { "type": "string" },
+                  "estimatedReadTime": { "type": "number" },
+                  "podcastUrl": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Post created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "post": { "$ref": "#/components/schemas/Post" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/posts/{id}": {
+      "get": {
+        "tags": ["Posts"],
+        "summary": "Get post by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Post details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "post": { "$ref": "#/components/schemas/Post" },
+                    "comments": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Comment" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Posts"],
+        "summary": "Update post",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": { "type": "string" },
+                  "content": { "type": "string" },
+                  "summary": { "type": "string" },
+                  "topics": { "type": "array", "items": { "type": "string" } },
+                  "tags": { "type": "array", "items": { "type": "string" } },
+                  "coverImage": { "type": "string" },
+                  "estimatedReadTime": { "type": "number" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Post updated successfully"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Posts"],
+        "summary": "Delete post",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Post deleted successfully"
+          }
+        }
+      }
+    },
+    "/posts/{id}/publish": {
+      "put": {
+        "tags": ["Posts"],
+        "summary": "Publish post (Admin only)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Post published successfully"
+          }
+        }
+      }
+    },
+    "/comments": {
+      "get": {
+        "tags": ["Comments"],
+        "summary": "Get comments (Admin only)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "query",
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": { "type": "string", "enum": ["pending", "approved", "rejected"] }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of comments",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Comment" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Comments"],
+        "summary": "Create comment",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["content", "postId"],
+                "properties": {
+                  "content": { "type": "string" },
+                  "postId": { "type": "string" },
+                  "parentComment": { "type": "string" },
+                  "rating": { "type": "number", "minimum": 1, "maximum": 5 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Comment created successfully"
+          }
+        }
+      }
+    },
+    "/comments/{id}": {
+      "put": {
+        "tags": ["Comments"],
+        "summary": "Update comment",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "content": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Comment updated successfully"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Comments"],
+        "summary": "Delete comment",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comment deleted successfully"
+          }
+        }
+      }
+    },
+    "/comments/{id}/approve": {
+      "put": {
+        "tags": ["Comments"],
+        "summary": "Approve comment (Admin only)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comment approved successfully"
+          }
+        }
+      }
+    },
+    "/topics": {
+      "get": {
+        "tags": ["Topics"],
+        "summary": "Get all topics",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "schema": { "type": "string" },
+            "description": "Search by name"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of topics",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "topics": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Topic" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Topics"],
+        "summary": "Create topic (Admin only)",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "description": { "type": "string" },
+                  "parentTopic": { "type": "string" },
+                  "isMainTopic": { "type": "boolean" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Topic created successfully"
+          }
+        }
+      }
+    },
+    "/topics/{id}": {
+      "put": {
+        "tags": ["Topics"],
+        "summary": "Update topic (Admin only)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "description": { "type": "string" },
+                  "parentTopic": { "type": "string" },
+                  "isMainTopic": { "type": "boolean" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Topic updated successfully"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Topics"],
+        "summary": "Delete topic (Admin only)",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Topic deleted successfully"
+          }
+        }
+      }
+    },
+    "/likes": {
+      "post": {
+        "tags": ["Likes"],
+        "summary": "Toggle like on post",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["postId"],
+                "properties": {
+                  "postId": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Like toggled successfully"
+          }
+        }
+      }
+    },
+    "/lists": {
+      "get": {
+        "tags": ["Lists"],
+        "summary": "Get user lists",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "User lists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "lists": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/List" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Lists"],
+        "summary": "Create new list",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "description": { "type": "string" },
+                  "isPrivate": { "type": "boolean" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "List created successfully"
+          }
+        }
+      }
+    },
+    "/lists/{id}": {
+      "put": {
+        "tags": ["Lists"],
+        "summary": "Update list",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "description": { "type": "string" },
+                  "isPrivate": { "type": "boolean" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "List updated successfully"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Lists"],
+        "summary": "Delete list",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List deleted successfully"
+          }
+        }
+      }
+    },
+    "/lists/{id}/posts": {
+      "post": {
+        "tags": ["Lists"],
+        "summary": "Add post to list",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["postId"],
+                "properties": {
+                  "postId": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Post added to list successfully"
+          }
+        }
+      }
+    },
+    "/lists/{id}/posts/{postId}": {
+      "delete": {
+        "tags": ["Lists"],
+        "summary": "Remove post from list",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "postId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Post removed from list successfully"
+          }
+        }
+      }
+    },
+    "/notifications": {
+      "get": {
+        "tags": ["Notifications"],
+        "summary": "Get user notifications",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "User notifications",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "notifications": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Notification" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/notifications/{id}/read": {
+      "put": {
+        "tags": ["Notifications"],
+        "summary": "Mark notification as read",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notification marked as read"
+          }
+        }
+      }
+    },
+    "/upload": {
+      "post": {
+        "tags": ["Upload"],
+        "summary": "Upload file",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "postId": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "File uploaded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "fileUrl": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
